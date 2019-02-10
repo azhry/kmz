@@ -1,0 +1,7 @@
+1. Profil admin
+2. Validasi tacit & explicit
+3. Searching
+4. Reward (ditentukan oleh kepala cabang)
+5. Pagination di pengetahuan tacit & explicit (beserta like)
+6. Data revise
+7. Laporan
