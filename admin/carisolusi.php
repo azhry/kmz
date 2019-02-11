@@ -8,45 +8,92 @@ if(!isset($_POST['gejala']))
 }
 else
 {
+
+// CBR START
 $gejala = $_POST['gejala'];
 $jumlah_dipilih = count($gejala);
 
-$a=mysqli_query($koneksi, "select * from solusi");
-$hasil=0;
-while($b=mysqli_fetch_array($a))
-{	
-	$bobot=0;
-	$total_bobot=0;
-	$kemiripan=0;
-	$bagi=0;
-	$c=mysqli_query($koneksi, "select * from masalah where id_solusi='$b[id_solusi]'");
-	while($d=mysqli_fetch_array($c))
-	{
-	for($x=0;$x<$jumlah_dipilih;$x++)
-	{
-		if($d['id_gejala']==$gejala[$x])
-		{
-			$e=mysqli_query($koneksi, "select * from gejala where id_gejala='$d[id_gejala]'");
-			$f=mysqli_fetch_array($e);
-			$bobot=$bobot+$f['bobot_gejala'];
-			$bagi++;
-		}
-		$g=mysqli_query($koneksi, "select * from gejala where id_gejala='$gejala[$x]'");
-		while($h=mysqli_fetch_array($g))
-		{
-		$total_bobot=$total_bobot+$h['bobot_gejala'];
-		}
-	}
-	
-	
-	$kemiripan=$bobot/($total_bobot/$bagi);
-	if($kemiripan > $hasil)
-	{
-		$hasil=$kemiripan;
-		$id_solusi=$d['id_solusi'];
-	}
-	}
+$sql = 'SELECT * FROM gejala WHERE id_gejala IN (';
+foreach ($gejala as $i => $id_gejala)
+{
+    $sql .= $id_gejala;
+    if ($i < $jumlah_dipilih - 1)
+    {
+        $sql .= ',';
+    }
 }
+$sql .= ')';
+$results = mysqli_query($koneksi, $sql);
+$all_gejala = [];
+while ($row = mysqli_fetch_array($results, MYSQLI_ASSOC))
+{
+    $all_gejala []= $row;
+}
+$sql = 'SELECT * FROM masalah';
+$masalah = mysqli_query($koneksi, $sql);
+$record_masalah = [];
+$similarities = [];
+$id_gejala = array_column($all_gejala, 'id_gejala');
+$bobot_gejala = array_column($all_gejala, 'bobot_gejala');
+foreach ($masalah as $row)
+{
+    $sql = 'SELECT * FROM gejala_masalah WHERE id_masalah = ' . $row['id_masalah'];
+    $gejala_masalah = mysqli_query($koneksi, $sql);
+    $similarity = 0;
+    foreach ($gejala_masalah as $gejala)
+    {
+        $index = array_search($gejala['id_gejala'], $id_gejala);
+        if ($index !== false)
+        {
+            $similarity += $bobot_gejala[$index];
+        }
+    }
+    $similarity = $similarity / array_sum($bobot_gejala);
+    $similarities []= $similarity;
+    $row['similarity'] = $similarity;
+    $record_masalah []= $row;
+}
+array_multisort($similarities, SORT_DESC, $record_masalah);
+
+// CBR END
+
+
+// $a=mysqli_query($koneksi, "select * from solusi");
+// $hasil=0;
+// while($b=mysqli_fetch_array($a))
+// {	
+// 	$bobot=0;
+// 	$total_bobot=0;
+// 	$kemiripan=0;
+// 	$bagi=0;
+// 	$c=mysqli_query($koneksi, "select * from masalah where id_solusi='$b[id_solusi]'");
+// 	while($d=mysqli_fetch_array($c))
+// 	{
+// 	for($x=0;$x<$jumlah_dipilih;$x++)
+// 	{
+// 		if($d['id_gejala']==$gejala[$x])
+// 		{
+// 			$e=mysqli_query($koneksi, "select * from gejala where id_gejala='$d[id_gejala]'");
+// 			$f=mysqli_fetch_array($e);
+// 			$bobot=$bobot+$f['bobot_gejala'];
+// 			$bagi++;
+// 		}
+// 		$g=mysqli_query($koneksi, "select * from gejala where id_gejala='$gejala[$x]'");
+// 		while($h=mysqli_fetch_array($g))
+// 		{
+// 		$total_bobot=$total_bobot+$h['bobot_gejala'];
+// 		}
+// 	}
+	
+	
+// 	$kemiripan=$bobot/($total_bobot/$bagi);
+// 	if($kemiripan > $hasil)
+// 	{
+// 		$hasil=$kemiripan;
+// 		$id_solusi=$d['id_solusi'];
+// 	}
+// 	}
+// }
 }
 ?>
 <!DOCTYPE html>
@@ -259,10 +306,10 @@ while($b=mysqli_fetch_array($a))
                         <div class="body">
                             <?php 
 							$no=0;
-							for($x=0;$x<$jumlah_dipilih;$x++)
+							foreach ($id_gejala as $row)
 							{
 								$no++;
-								$sql=mysqli_query($koneksi, "select * from gejala where id_gejala='$gejala[$x]'");
+								$sql=mysqli_query($koneksi, "select * from gejala where id_gejala='$row'");
 								$data=mysqli_fetch_array($sql);
 								echo "$no";
 								echo ".) ";
@@ -282,16 +329,48 @@ while($b=mysqli_fetch_array($a))
                         </div>
                         <div class="body">
                             <?php 
-							$sql=mysqli_query($koneksi, "select * from solusi where id_solusi='$id_solusi'");
-							$data=mysqli_fetch_array($sql);
-							echo "<b>Nama Solusi</b>";
-							echo ' : '.$data['nama_solusi'];
-							echo "<br>";
-							echo "<b>Solusi Masalah</b>";
-							echo ' : '.$data['solusi_masalah'];
-							echo "<br>";
-							echo "<b>Kemiripan</b>";
-							echo ' : '.$hasil;
+                            if (count($record_masalah) > 0)
+                            {
+                                // fuzzy start
+                                $similarity = $record_masalah[0]['similarity'];
+                                if ($similarity >= 0 or $similarity <= 0.5)
+                                {
+                                    $category = 'Low';
+                                    $fuzzy = $similarity / 0.25;
+                                }
+                                else if ($similarity >= 0.45 or $similarity <= 0.75)
+                                {
+                                    $category = 'Moderate';
+                                    $fuzzy = ($similarity - 0.45) / 0.15;
+                                }
+                                else if ($similarity >= 0.7 or $similarity <= 1)
+                                {
+                                    $category = 'High';
+                                    $fuzzy = ($similarity - 0.7) / 0.15;
+                                }
+                                // fuzzy end
+
+                                $sql = 'SELECT * FROM solusi WHERE id_solusi=' . $record_masalah[0]['id_solusi'];
+                                $solusi = mysqli_fetch_array(mysqli_query($koneksi, $sql));
+                                echo "<b>Nama Solusi</b>";
+                                echo ' : '.$solusi['nama_solusi'];
+                                echo "<br>";
+                                echo "<b>Solusi Masalah</b>";
+                                echo ' : '.$solusi['solusi_masalah'];
+                                echo "<br>";
+                                echo "<b>Kemiripan</b>";
+                                echo ' : '.$record_masalah[0]['similarity'];
+                                echo "<br>";
+                                echo "<b>Kategori</b>";
+                                echo ' : '.$category;
+                                echo "<br>";
+                                echo "<b>Nilai Fuzzy</b>";
+                                echo ' : '.$fuzzy;
+                            }
+                            else
+                            {
+                                echo 'Belum ada solusi';
+                            }
 							?>
                         </div>
                         </div>

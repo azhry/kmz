@@ -8,13 +8,13 @@ else
 {
     include'koneksi.php';
 }
-    $query="SELECT * FROM ((masalah 
-            JOIN gejala ON masalah.id_gejala=gejala.id_gejala)
-            JOIN solusi ON masalah.id_solusi=solusi.id_solusi)
-            GROUP BY solusi.id_solusi";
+    $query="SELECT * FROM masalah
+            JOIN solusi ON masalah.id_solusi=solusi.id_solusi";
     $sql=mysqli_query($koneksi,$query);
     $mun=mysqli_num_rows($sql);
-   
+    
+    $query = 'SELECT * FROM solusi';
+    $solusi = mysqli_query($koneksi, $query);
 ?>
 <!DOCTYPE html>
 <html>
@@ -213,11 +213,11 @@ else
                         <div class="body">
                             <form action="simpanmasalah.php" method="POST" enctype="multipart/form-data">
                                <div class="form-group">
-                                <label>Kode Solusi</label>
+                                <!-- <label>Kode Solusi</label>
                                  <div class="form-line">
                                      <input type="text" name="id_solusi" value="<?php echo $mun+1 ?>" id="solusi" class="form-control" placeholder="Enter here" disabled>
                                      </div>
-                                </div>
+                                </div> -->
 
                                 <label>Gejala 1</label>
                                 <div class="form-group 1" data-no='1'>
@@ -238,14 +238,20 @@ else
                                 <label>Nama Masalah</label>
                                 <div class="form-group">
                                         <div class="form-line">
-                                            <input type="text" name="" id="" class="form-control" placeholder="Enter here">
+                                            <input type="text" name="masalah" id="" class="form-control" placeholder="Enter here">
                                         </div>
                                 </div>
 
                             <label>Solusi</label>
-                            <textarea id="ckeditor" name="">
+                            <select class="form-control" required name="id_solusi">
+                                <option value="">Pilih Solusi</option>
+                                <?php foreach ($solusi as $row): ?>
+                                    <option value="<?= $row['id_solusi'] ?>"><?= $row['solusi_masalah'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <!-- <textarea id="ckeditor" name="solusi">
                                 
-                            </textarea>
+                            </textarea> -->
                             <br>
                            
                             <button type="submit" class="btn btn-primary m-t-15 waves-effect">SUBMIT</button>
@@ -266,15 +272,6 @@ else
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Gejala</th>
-                                            <th>Masalah</th>
-                                            <th>Solusi</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </tfoot>
                                     <tbody>
                                         <?php 
                                             $no=1; foreach ($sql as $data): 
@@ -289,11 +286,7 @@ else
                                                 </tr>
 
                                                 <?php 
-                                                 $quer="SELECT * FROM (((masalah 
-                                                        JOIN gejala ON masalah.id_gejala=gejala.id_gejala)
-                                                        JOIN solusi ON masalah.id_solusi=solusi.id_solusi)
-                                                        JOIN kategori ON gejala.id_kategori=kategori.id_kategori)
-                                                        WHERE solusi.id_solusi=".$data['id_solusi']."";
+                                                 $quer="SELECT * FROM gejala_masalah JOIN gejala ON gejala_masalah.id_gejala = gejala.id_gejala JOIN kategori ON gejala.id_kategori = kategori.id_kategori WHERE gejala_masalah.id_masalah=" . $data['id_masalah'];
                                                 $sq=mysqli_query($koneksi,$quer);
                                                 echo(mysqli_error($koneksi));
                                                 foreach($sq as $gm):
@@ -311,7 +304,9 @@ else
                                             </td>
                                             <td><?php echo $data['solusi_masalah'];?></td>
                                            
-                                            <td><i class="material-icons left"><a href="editkategori.php?id_kategori=<?php echo $data['id_kategori'];?>">mode_edit</a></i> &nbsp;&nbsp; <i class="material-icons left"><a href="hapuskategori.php?id_kategori=<?php echo $data['id_kategori'];?>">delete</a></i></td>
+                                            <td>
+                                                <!-- <i class="material-icons left"><a href="editkategori.php?id_kategori=<?php echo $data['id_kategori'];?>">mode_edit</a></i> &nbsp;&nbsp; <i class="material-icons left"><a href="hapuskategori.php?id_kategori=<?php echo $data['id_kategori'];?>">delete</a></i> -->
+                                            </td>
                                         </tr>
                                             <?php endforeach;?>
                                     </tbody>

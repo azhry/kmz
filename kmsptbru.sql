@@ -1,26 +1,26 @@
 -- phpMyAdmin SQL Dump
--- version 4.0.4
--- http://www.phpmyadmin.net
+-- version 4.7.4
+-- https://www.phpmyadmin.net/
 --
--- Inang: 127.0.0.1
--- Waktu pembuatan: 21 Jan 2019 pada 07.50
--- Versi Server: 5.5.32
--- Versi PHP: 5.4.16
+-- Host: 127.0.0.1
+-- Generation Time: 11 Feb 2019 pada 04.17
+-- Versi Server: 10.1.28-MariaDB
+-- PHP Version: 7.1.11
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
--- Basis data: `kmsptbru`
+-- Database: `kmsptbru`
 --
-CREATE DATABASE IF NOT EXISTS `kmsptbru` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `kmsptbru`;
 
 -- --------------------------------------------------------
 
@@ -28,8 +28,8 @@ USE `kmsptbru`;
 -- Struktur dari tabel `explicit`
 --
 
-CREATE TABLE IF NOT EXISTS `explicit` (
-  `id_explicit` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `explicit` (
+  `id_explicit` int(11) NOT NULL,
   `id_kategori` int(11) NOT NULL,
   `tgl_post` date NOT NULL,
   `judul` text NOT NULL,
@@ -37,9 +37,8 @@ CREATE TABLE IF NOT EXISTS `explicit` (
   `dokumen` varchar(100) NOT NULL,
   `nama_dokumen` varchar(50) NOT NULL,
   `pegawai` varchar(25) NOT NULL,
-  `status_validasi` varchar(5) NOT NULL,
-  PRIMARY KEY (`id_explicit`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+  `status_validasi` varchar(5) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `explicit`
@@ -56,13 +55,12 @@ INSERT INTO `explicit` (`id_explicit`, `id_kategori`, `tgl_post`, `judul`, `kete
 -- Struktur dari tabel `gejala`
 --
 
-CREATE TABLE IF NOT EXISTS `gejala` (
-  `id_gejala` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `gejala` (
+  `id_gejala` int(11) NOT NULL,
   `nama_gejala` text NOT NULL,
   `bobot_gejala` int(11) NOT NULL,
-  `id_kategori` int(11) NOT NULL,
-  PRIMARY KEY (`id_gejala`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
+  `id_kategori` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `gejala`
@@ -78,14 +76,33 @@ INSERT INTO `gejala` (`id_gejala`, `nama_gejala`, `bobot_gejala`, `id_kategori`)
 -- --------------------------------------------------------
 
 --
+-- Struktur dari tabel `gejala_masalah`
+--
+
+CREATE TABLE `gejala_masalah` (
+  `id_gejala_masalah` int(11) NOT NULL,
+  `id_masalah` int(11) NOT NULL,
+  `id_gejala` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel `gejala_masalah`
+--
+
+INSERT INTO `gejala_masalah` (`id_gejala_masalah`, `id_masalah`, `id_gejala`) VALUES
+(1, 21, 8),
+(2, 21, 10);
+
+-- --------------------------------------------------------
+
+--
 -- Struktur dari tabel `kategori`
 --
 
-CREATE TABLE IF NOT EXISTS `kategori` (
-  `id_kategori` int(11) NOT NULL AUTO_INCREMENT,
-  `nama_kategori` varchar(20) NOT NULL,
-  PRIMARY KEY (`id_kategori`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+CREATE TABLE `kategori` (
+  `id_kategori` int(11) NOT NULL,
+  `nama_kategori` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `kategori`
@@ -101,14 +118,13 @@ INSERT INTO `kategori` (`id_kategori`, `nama_kategori`) VALUES
 -- Struktur dari tabel `komentarexplicit`
 --
 
-CREATE TABLE IF NOT EXISTS `komentarexplicit` (
-  `id_komentarexplicit` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `komentarexplicit` (
+  `id_komentarexplicit` int(11) NOT NULL,
   `id_explicit` int(11) NOT NULL,
   `nama` varchar(25) NOT NULL,
   `isi_komentar` text NOT NULL,
-  `tgl_komentar` date NOT NULL,
-  PRIMARY KEY (`id_komentarexplicit`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+  `tgl_komentar` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -116,14 +132,13 @@ CREATE TABLE IF NOT EXISTS `komentarexplicit` (
 -- Struktur dari tabel `komentartacit`
 --
 
-CREATE TABLE IF NOT EXISTS `komentartacit` (
-  `id_komentartacit` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `komentartacit` (
+  `id_komentartacit` int(11) NOT NULL,
   `id_tacit` int(11) NOT NULL,
   `nama` varchar(25) NOT NULL,
   `isi_komentar` text NOT NULL,
-  `tgl_komentar` date NOT NULL,
-  PRIMARY KEY (`id_komentartacit`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
+  `tgl_komentar` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `komentartacit`
@@ -140,28 +155,17 @@ INSERT INTO `komentartacit` (`id_komentartacit`, `id_tacit`, `nama`, `isi_koment
 -- Struktur dari tabel `masalah`
 --
 
-CREATE TABLE IF NOT EXISTS `masalah` (
-  `id_masalah` int(11) NOT NULL AUTO_INCREMENT,
-  `id_gejala` int(11) NOT NULL,
-  `id_solusi` int(11) NOT NULL,
-  PRIMARY KEY (`id_masalah`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=21 ;
+CREATE TABLE `masalah` (
+  `id_masalah` int(11) NOT NULL,
+  `id_solusi` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `masalah`
 --
 
-INSERT INTO `masalah` (`id_masalah`, `id_gejala`, `id_solusi`) VALUES
-(11, 9, 1),
-(12, 12, 1),
-(13, 11, 1),
-(14, 9, 2),
-(15, 8, 2),
-(16, 10, 2),
-(17, 9, 3),
-(18, 8, 3),
-(19, 9, 4),
-(20, 11, 4);
+INSERT INTO `masalah` (`id_masalah`, `id_solusi`) VALUES
+(21, 3);
 
 -- --------------------------------------------------------
 
@@ -169,12 +173,11 @@ INSERT INTO `masalah` (`id_masalah`, `id_gejala`, `id_solusi`) VALUES
 -- Struktur dari tabel `solusi`
 --
 
-CREATE TABLE IF NOT EXISTS `solusi` (
-  `id_solusi` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `solusi` (
+  `id_solusi` int(11) NOT NULL,
   `nama_solusi` text NOT NULL,
-  `solusi_masalah` text NOT NULL,
-  PRIMARY KEY (`id_solusi`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+  `solusi_masalah` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `solusi`
@@ -192,17 +195,16 @@ INSERT INTO `solusi` (`id_solusi`, `nama_solusi`, `solusi_masalah`) VALUES
 -- Struktur dari tabel `tacit`
 --
 
-CREATE TABLE IF NOT EXISTS `tacit` (
-  `id_tacit` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `tacit` (
+  `id_tacit` int(11) NOT NULL,
   `id_kategori` int(11) NOT NULL,
   `tgl_post` date NOT NULL,
   `judul` text NOT NULL,
   `masalah` text NOT NULL,
   `solusi` text NOT NULL,
   `status_validasi` varchar(5) NOT NULL,
-  `pegawai` varchar(25) NOT NULL,
-  PRIMARY KEY (`id_tacit`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=51 ;
+  `pegawai` varchar(25) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `tacit`
@@ -266,8 +268,8 @@ INSERT INTO `tacit` (`id_tacit`, `id_kategori`, `tgl_post`, `judul`, `masalah`, 
 -- Struktur dari tabel `users`
 --
 
-CREATE TABLE IF NOT EXISTS `users` (
-  `id_user` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `users` (
+  `id_user` int(11) NOT NULL,
   `no_badge` varchar(20) NOT NULL,
   `username` varchar(30) NOT NULL,
   `password` varchar(25) NOT NULL,
@@ -277,9 +279,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   `tanggal_lahir` varchar(10) NOT NULL,
   `telepon` varchar(13) NOT NULL,
   `foto` varchar(50) NOT NULL,
-  `jabatan` varchar(30) NOT NULL,
-  PRIMARY KEY (`id_user`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+  `jabatan` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `users`
@@ -290,6 +291,135 @@ INSERT INTO `users` (`id_user`, `no_badge`, `username`, `password`, `nama`, `jen
 (3, '2345', 'Pakar', '12345', 'Ridwan', 'Laki-laki', 'Palembang', '1997-11-17', '081377760287', 'logo.PNG', 'tim validasi'),
 (4, '3456', 'Kepala Cabang', '12345', 'Yopis', 'Laki-laki', 'Palembang', '1997-10-23', '089765234321', 'FJ7A6283 copy.jpg', 'manager'),
 (7, '4567', 'User', '12345', 'Adi', 'Laki-laki', 'Jakarta', '1995-03-12', '089765234322', '', 'pengguna');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `explicit`
+--
+ALTER TABLE `explicit`
+  ADD PRIMARY KEY (`id_explicit`);
+
+--
+-- Indexes for table `gejala`
+--
+ALTER TABLE `gejala`
+  ADD PRIMARY KEY (`id_gejala`);
+
+--
+-- Indexes for table `gejala_masalah`
+--
+ALTER TABLE `gejala_masalah`
+  ADD PRIMARY KEY (`id_gejala_masalah`);
+
+--
+-- Indexes for table `kategori`
+--
+ALTER TABLE `kategori`
+  ADD PRIMARY KEY (`id_kategori`);
+
+--
+-- Indexes for table `komentarexplicit`
+--
+ALTER TABLE `komentarexplicit`
+  ADD PRIMARY KEY (`id_komentarexplicit`);
+
+--
+-- Indexes for table `komentartacit`
+--
+ALTER TABLE `komentartacit`
+  ADD PRIMARY KEY (`id_komentartacit`);
+
+--
+-- Indexes for table `masalah`
+--
+ALTER TABLE `masalah`
+  ADD PRIMARY KEY (`id_masalah`);
+
+--
+-- Indexes for table `solusi`
+--
+ALTER TABLE `solusi`
+  ADD PRIMARY KEY (`id_solusi`);
+
+--
+-- Indexes for table `tacit`
+--
+ALTER TABLE `tacit`
+  ADD PRIMARY KEY (`id_tacit`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id_user`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `explicit`
+--
+ALTER TABLE `explicit`
+  MODIFY `id_explicit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `gejala`
+--
+ALTER TABLE `gejala`
+  MODIFY `id_gejala` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `gejala_masalah`
+--
+ALTER TABLE `gejala_masalah`
+  MODIFY `id_gejala_masalah` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `kategori`
+--
+ALTER TABLE `kategori`
+  MODIFY `id_kategori` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `komentarexplicit`
+--
+ALTER TABLE `komentarexplicit`
+  MODIFY `id_komentarexplicit` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `komentartacit`
+--
+ALTER TABLE `komentartacit`
+  MODIFY `id_komentartacit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `masalah`
+--
+ALTER TABLE `masalah`
+  MODIFY `id_masalah` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `solusi`
+--
+ALTER TABLE `solusi`
+  MODIFY `id_solusi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `tacit`
+--
+ALTER TABLE `tacit`
+  MODIFY `id_tacit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
