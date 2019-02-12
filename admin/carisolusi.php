@@ -333,17 +333,17 @@ array_multisort($similarities, SORT_DESC, $record_masalah);
                             {
                                 // fuzzy start
                                 $similarity = $record_masalah[0]['similarity'];
-                                if ($similarity >= 0 or $similarity <= 0.5)
+                                if ($similarity >= 0 && $similarity <= 0.5)
                                 {
                                     $category = 'Low';
                                     $fuzzy = $similarity / 0.25;
                                 }
-                                else if ($similarity >= 0.45 or $similarity <= 0.75)
+                                else if ($similarity >= 0.45 && $similarity <= 0.75)
                                 {
                                     $category = 'Moderate';
                                     $fuzzy = ($similarity - 0.45) / 0.15;
                                 }
-                                else if ($similarity >= 0.7 or $similarity <= 1)
+                                else if ($similarity >= 0.7 && $similarity <= 1)
                                 {
                                     $category = 'High';
                                     $fuzzy = ($similarity - 0.7) / 0.15;
